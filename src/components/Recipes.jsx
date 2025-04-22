@@ -407,7 +407,7 @@ const Recipes = ({ data, updateData }) => {
         
       const categoryDescription = getCategoryDescription(category);
 
-      const response = await fetch("http://localhost:5001/claude", {
+      const response = await fetch("/claude", {
         method: "POST",
         headers: {
           "x-api-key": apiKey,
