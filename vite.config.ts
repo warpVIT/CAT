@@ -6,6 +6,13 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: true, // для внешнего доступа (ngrok)
-    allowedHosts: true // ✅ разрешить любые домены
+    allowedHosts: true, // ✅ разрешить любые домены
+    proxy: {
+      '/claude': {
+        target: 'http://localhost:5001',
+        changeOrigin: true,
+        rewrite: (path) => path
+      }
+    }
   }
 });
