@@ -124,7 +124,7 @@ const Habits = ({ data, updateData }) => {
 
     setIsLoading(true);
     try {
-      const response = await fetch("http://localhost:5001/claude", {
+      const response = await fetch("/claude", {
         method: "POST",
         headers: {
           "x-api-key": apiKey,
