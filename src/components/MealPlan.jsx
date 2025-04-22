@@ -525,7 +525,7 @@ const MealPlan = ({ data, updateData }) => {
         : "";
 
       // Отправляем запрос на каждый тип блюда отдельно, чтобы получить более качественные результаты
-      const breakfastResponse = await fetch("http://localhost:5001/claude", {
+      const breakfastResponse = await fetch("/claude", {
         method: "POST",
         headers: {
           "x-api-key": apiKey,
