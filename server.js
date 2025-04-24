@@ -11,28 +11,25 @@ const port = process.env.PORT || 5001;
 app.use(cors());
 app.use(bodyParser.json());
 
-// Логгирование для отладки запросов
+// Логирование для отладки
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
   next();
 });
 
-// Маршрут для проверки работоспособности сервера
+// Проверка работоспособности
 app.get('/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Сервер работает' });
+  res.json({ 
+    status: 'ok', 
+    message: 'Сервер работает',
+    timestamp: new Date().toISOString()
+  });
 });
 
-// Статические файлы, если есть сборка фронтенда
-app.use(express.static(path.join(__dirname, 'dist')));
-
-// Маршрут для тестирования API Claude
+// Главный маршрут для обработки запросов к Claude API
 app.post('/claude', async (req, res) => {
   try {
     const { apiKey, payload } = req.body;
-    
-    // Логирование для отладки (без ключа API)
-    console.log('Получен запрос к Claude API с payload:', 
-      JSON.stringify(payload, null, 2).substring(0, 500) + '...');
     
     if (!apiKey) {
       return res.status(400).json({ error: 'API ключ не предоставлен' });
@@ -43,8 +40,9 @@ app.post('/claude', async (req, res) => {
     }
     
     // Отправка запроса к API Claude
+    console.log('Отправка запроса к API Claude...');
+    
     try {
-      console.log('Отправка запроса к API Claude...');
       const response = await axios.post('https://api.anthropic.com/v1/messages', payload, {
         headers: {
           'x-api-key': apiKey,
@@ -53,12 +51,8 @@ app.post('/claude', async (req, res) => {
         }
       });
       
-      console.log('Получен ответ от Claude API:', 
-        JSON.stringify(response.data).substring(0, 500) + '...');
-      
       // Отправка ответа клиенту
       res.json(response.data);
-      
     } catch (apiError) {
       console.error('Ошибка API Claude:', apiError.message);
       console.error('Детали:', apiError.response?.data || 'Нет дополнительных данных');
@@ -74,10 +68,20 @@ app.post('/claude', async (req, res) => {
   }
 });
 
-// Обработка всех остальных маршрутов для SPA
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
-});
+// Обработка статических файлов, если они есть
+if (fs.existsSync(path.join(__dirname, 'dist'))) {
+  app.use(express.static(path.join(__dirname, 'dist')));
+  
+  // Обработка всех остальных маршрутов для SPA
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  });
+} else {
+  // Если нет статических файлов, просто отправляем текстовое сообщение
+  app.get('/', (req, res) => {
+    res.send('API сервер для интеграции с Claude. Используйте /claude для запросов.');
+  });
+}
 
 // Запуск сервера
 app.listen(port, () => {
