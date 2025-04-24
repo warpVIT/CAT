@@ -79,7 +79,10 @@ app.post('/claude', async (req, res) => {
     console.log('Отправка запроса к API Claude...');
     
     try {
-      const response = await axios.post('https://api.anthropic.com/v1/messages', payload, {
+      // Используем URL API Claude без шаблонных выражений
+      const claudeApiUrl = 'https://api.anthropic.com/v1/messages';
+      
+      const response = await axios.post(claudeApiUrl, payload, {
         headers: {
           'x-api-key': apiKey,
           'anthropic-version': '2023-06-01',
@@ -106,8 +109,34 @@ app.post('/claude', async (req, res) => {
   }
 });
 
-// Последний маршрут - для Single Page Applications, чтобы направлять все запросы на index.html
+// Обрабатываем запрос к корневому маршруту, чтобы проверить, работает ли сервер
+app.get('/', (req, res, next) => {
+  // Если есть index.html, используем его
+  const indexHtmlPaths = [
+    path.join(__dirname, 'dist', 'index.html'),
+    path.join(__dirname, 'public', 'index.html'),
+    path.join(__dirname, 'index.html'),
+    path.join(__dirname, 'src', 'index.html')
+  ];
+  
+  for (const htmlPath of indexHtmlPaths) {
+    if (fs.existsSync(htmlPath)) {
+      return res.sendFile(htmlPath);
+    }
+  }
+  
+  // Если нет index.html, просто отправляем простое сообщение
+  res.send('API сервер для интеграции с Claude. Используйте /claude для запросов.');
+  // Не вызываем next(), чтобы завершить обработку запроса здесь
+});
+
+// Последний маршрут - для Single Page Applications, чтобы направлять все другие запросы на index.html
 app.get('*', (req, res) => {
+  // Исключаем запросы к API и файлам из обработки
+  if (req.url.startsWith('/api/') || req.url.startsWith('/claude') || req.url.includes('.')) {
+    return res.status(404).json({ error: 'Not found' });
+  }
+  
   // Выбираем первую доступную index.html из возможных локаций
   const possiblePaths = [
     path.join(__dirname, 'dist', 'index.html'),
