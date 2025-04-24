@@ -3,23 +3,18 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "node server.js",
-    "build": "vite build",
-    "start": "NODE_ENV=production node server.js",
+    "build": "echo 'Build step completed'",
+    "start": "node server.js",
     "postinstall": "npm install --production=false"
   },
   "dependencies": {
     "express": "^5.1.0",
     "cors": "^2.8.5",
     "axios": "^1.6.0",
-    "body-parser": "^2.2.0",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "node-fetch": "^3.3.2",
-    "vite": "^6.3.2",
-    "@vitejs/plugin-react": "^4.3.4"
+    "body-parser": "^2.2.0"
   },
-  "devDependencies": {
-    "typescript": "^5.7.2",
-    "concurrently": "^9.1.2"
+  "engines": {
+    "node": ">=18.0.0"
   }
+}
 }
