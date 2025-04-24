@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "node server.js",
-    "build": "echo 'Build step completed'",
-    "start": "node server.js",
-    "postinstall": "npm install --production=false"
+    "build": "chmod +x build.sh && ./build.sh",
+    "start": "node server.js"
   },
   "dependencies": {
     "express": "^5.1.0",
